@@ -59,12 +59,12 @@ class PostView(APIView):
                 post_service.update(id, request.data)
                 logger.debug(
                     f"Updated post with id: {id}")
-                return response.ok({})
+                return response.ok()
             elif serializer.is_valid():
                 # Create a new entry in the database
                 post_service.create(serializer.data)
                 logger.debug(f"Created post with id: {id}")
-                return response.ok({})
+                return response.ok()
             return response.error(data=serializer.errors, status=422)
         except Exception as e:
             logger.exception(e)

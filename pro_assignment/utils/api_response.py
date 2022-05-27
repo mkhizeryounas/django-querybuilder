@@ -11,7 +11,7 @@ ERROR_CODES = {
 }
 
 
-def ok(data=None):
+def ok(data={}, status=200):
     """Format success response
 
     Args:
@@ -20,7 +20,7 @@ def ok(data=None):
     Returns:
         Response: Re-formated response
     """
-    return Response(data)
+    return Response(data, status=status)
 
 
 def error(data=None, status=400):

@@ -37,7 +37,6 @@ class TestPostView(APITestCase):
         Post.objects.create(**self.payload)
         response = self.client.post(
             self.url, update_payload, format='json')
-        logger.debug(response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         count = Post.objects.count()
         post = Post.objects.get(id=self.payload['id'])

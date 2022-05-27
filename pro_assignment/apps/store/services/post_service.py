@@ -1,4 +1,3 @@
-from django import views
 from ..models import Post
 import logging
 from django.db.models import Q
