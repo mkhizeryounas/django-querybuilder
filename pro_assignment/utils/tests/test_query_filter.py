@@ -74,6 +74,15 @@ class TestQueryFilter(SimpleTestCase):
                 parsed_query
             ]
         },
+        {
+            'input': f'AND({query}, NOT({query}))',
+            'actual': [
+                {'operator': 'AND'},
+                parsed_query,
+                {'operator': 'NOT'},
+                parsed_query
+            ]
+        },
     )
     def test_should_tokenize_query(self, params):
         """Test Tokenizes query"""
@@ -123,7 +132,7 @@ class TestQueryFilter(SimpleTestCase):
                 parsed_query_lt
             ],
             'actual': construct_actual_filter(conn_type=Q.AND, both_params_not=True)
-        }
+        },
     )
     def test_should_array_to_tree_return_filter_tree(self, params):
         """Test converts operator array to query tree"""
