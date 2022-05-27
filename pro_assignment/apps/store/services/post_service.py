@@ -23,7 +23,7 @@ def create(post_data):
     Returns:
         bool: success boolean
     """
-    return True if Post.objects.create(**post_data) == 1 else False
+    return Post.objects.create(**post_data)
 
 
 def exists(id):
@@ -38,6 +38,18 @@ def exists(id):
     return Post.objects.filter(id=id).exists()
 
 
+def get(id):
+    """Check if post exists
+
+    Args:
+        id (str): post id
+
+    Returns:
+        dict: post data
+    """
+    return Post.objects.get(id=id)
+
+
 def update(id, post_data):
     """Update post
 
@@ -48,4 +60,4 @@ def update(id, post_data):
     Returns:
         bool: success boolean
     """
-    return True if Post.objects.filter(id=id).update(**post_data) == 1 else False
+    return True if Post.objects.filter(id=id).update(**post_data) > 0 else False
