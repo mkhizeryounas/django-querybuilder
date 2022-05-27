@@ -7,7 +7,7 @@ from django.db.models import Q
 logger = logging.getLogger(__name__)
 
 
-def construct_actual_filter(conn_type=Q.AND):
+def construct_actual_filter(conn_type=Q.AND, both_params_not=False):
     """Construct actual Q filter
 
         Args:
@@ -17,8 +17,13 @@ def construct_actual_filter(conn_type=Q.AND):
             Q: Query filter
         """
     filter = Q()
-    filter.add(Q(id="first-post"), conn_type=conn_type)
-    filter.add(~Q(id="first-post"), conn_type=conn_type)
+
+    if both_params_not:
+        filter.add(~Q(id="first-post"), conn_type=conn_type)
+    else:
+        filter.add(Q(id="first-post"), conn_type=conn_type)
+
+    filter.add(~Q(views__lt=2), conn_type=conn_type)
     return filter
 
 
@@ -28,6 +33,8 @@ class TestQueryFilter(SimpleTestCase):
     query = 'EQUAL(id, "first-post")'
     parsed_query = {'operator': 'EQUAL',
                     'param1': 'id', 'param2': 'first-post'}
+    parsed_query_lt = {'operator': 'LESS_THAN',
+                       'param1': 'views', 'param2': 2}
 
     @ddt.data(
         {'input': 'LESS_THAN', 'actual': 'lt'},
@@ -46,6 +53,10 @@ class TestQueryFilter(SimpleTestCase):
             'actual': [
                 parsed_query
             ]
+        },
+        {
+            'input': "",
+            'actual': []
         },
         {
             'input': f'NOT({query})',
@@ -68,11 +79,15 @@ class TestQueryFilter(SimpleTestCase):
         """Test Tokenizes query"""
         self.assertListEqual(tokenize(params['input']), params['actual'])
 
-    def test_should_tokenize_raise_exception_with_invalid_query(self):
+    @ddt.data(
+        f'{query})',
+        f'({query}'
+    )
+    def test_should_tokenize_raise_exception_with_invalid_query(self, param):
         """Test raises exception with invalid query"""
         with self.assertRaises(Exception):
             # The passed query is not valid because the paranethesis are not balanced
-            tokenize(f'{self.query})')
+            tokenize(param)
 
     @ddt.data(
         {
@@ -85,7 +100,7 @@ class TestQueryFilter(SimpleTestCase):
                 {'operator': 'OR'},
                 parsed_query,
                 {'operator': 'NOT'},
-                parsed_query
+                parsed_query_lt
             ],
             'actual': construct_actual_filter(conn_type=Q.OR)
         },
@@ -95,9 +110,19 @@ class TestQueryFilter(SimpleTestCase):
                 {'operator': 'AND'},
                 parsed_query,
                 {'operator': 'NOT'},
-                parsed_query
+                parsed_query_lt
             ],
             'actual': construct_actual_filter(conn_type=Q.AND)
+        },
+        {
+            'input': [
+                {'operator': 'AND'},
+                {'operator': 'NOT'},
+                parsed_query,
+                {'operator': 'NOT'},
+                parsed_query_lt
+            ],
+            'actual': construct_actual_filter(conn_type=Q.AND, both_params_not=True)
         }
     )
     def test_should_array_to_tree_return_filter_tree(self, params):

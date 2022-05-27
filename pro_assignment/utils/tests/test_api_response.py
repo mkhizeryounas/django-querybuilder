@@ -22,3 +22,8 @@ class TestApiResponse(SimpleTestCase):
         self.assertEqual(response.status_code, status_code)
         self.assertEqual(response.data.get('message', None),
                          ERROR_CODES[status_code])
+
+    def test_should_return_http_error_default_status_code(self):
+        """Test ‘error’ should return a default error status code"""
+        response = error(status=411)
+        self.assertEqual(response.status_code, 400)

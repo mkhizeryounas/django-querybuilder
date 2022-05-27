@@ -5,7 +5,9 @@ omit =
     */apps.py
     */models.py
     */__init__.py
-
+    */migrations/*
+    */config.py
+    */settings.py
 
 [report]
 omit = 
@@ -14,4 +16,10 @@ omit =
     */apps.py
     */models.py
     */__init__.py
+    */migrations/*
+    */config.py
+    */settings.py
+
+
+
 show_missing = True
