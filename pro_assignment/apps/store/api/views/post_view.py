@@ -1,16 +1,12 @@
-from distutils.log import debug
-from re import S
-from rest_framework.views import APIView
-from ...models import Post
 from ..serializers.post_serializer import PostSerializer
 from pro_assignment.utils import api_response as response
 from ...services import post_service
 from pro_assignment.utils.query_filter import convert_query_to_filter
-from django.db.models import Q
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.generics import ListAPIView
-
 import logging
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -45,11 +41,11 @@ class PostView(ListAPIView):
             list: List of posts
         """
         try:
-            logger.debug(f"Query Params: {request.query_params}")
+            query = request.query_params.get('query', None)
+            logger.debug(f"Query Params: {query}")
             # Get the query parameters and convert them to filter
-            filter = convert_query_to_filter(
-                request.query_params.get('query', None)
-            )
+            filter = convert_query_to_filter(query)
+            logger.info(f"Query Tree: {filter}")
             posts = post_service.list(filter)
             serializer = PostSerializer(posts, many=True)
             return response.ok(serializer.data)
@@ -84,14 +80,14 @@ class PostView(ListAPIView):
                 # Conflict update the existing post
                 post_service.update(id, request.data)
                 # post = post_service.get(id)
-                logger.debug(
+                logger.info(
                     f"Updated post with id: {id}")
             elif serializer.is_valid():
                 # Create a new entry in the database
                 # post = post_service.create(serializer.data)
                 post_service.create(serializer.data)
                 # status = 201
-                logger.debug(f"Created post with id: {id}")
+                logger.info(f"Created post with id: {id}")
             else:
                 return response.error(data=serializer.errors, status=422)
 

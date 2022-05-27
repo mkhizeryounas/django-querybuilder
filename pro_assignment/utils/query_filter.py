@@ -64,7 +64,6 @@ def array_to_tree(array, filter=Q()):
         return Q(**{
             key: array[0]['param2']
         })
-    logger.info(f"Query Tree: {filter}")
     return filter
 
 
