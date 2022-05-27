@@ -18,8 +18,6 @@ def rename_operation_name(op):
         op = "gt"
     elif op == "EQUAL":
         op = "eq"
-    elif op == "NOT_EQUAL":
-        op = "ne"
     return op
 
 
@@ -53,10 +51,10 @@ def array_to_tree(array, filter=Q()):
     elif array[0]['operator'] == 'NOT':
         # Condition for NOT operator
         # Returns the negated filter
-        sub = ~array_to_tree(array[1:], filter)
-        return sub
+        sub_tree = ~array_to_tree(array[1:], filter)
+        return sub_tree
     else:
-        # Rename LESS_THAN to lt, GREATER_THAN to gt, EQUAL to eq, NOT_EQUAL to ne
+        # Rename LESS_THAN to lt, GREATER_THAN to gt, EQUAL to eq
         op = rename_operation_name(array[0]['operator'])
         key = array[0]['param1']
 

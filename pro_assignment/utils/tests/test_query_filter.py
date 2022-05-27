@@ -17,7 +17,6 @@ class TestQueryFilter(SimpleTestCase):
         self.assertEqual(rename_operation_name("LESS_THAN"), "lt")
         self.assertEqual(rename_operation_name("GREATER_THAN"), "gt")
         self.assertEqual(rename_operation_name("EQUAL"), "eq")
-        self.assertEqual(rename_operation_name("NOT_EQUAL"), "ne")
 
     def test_should_tokenize_query(self):
         """Test Tokenizes query"""
@@ -45,30 +44,36 @@ class TestQueryFilter(SimpleTestCase):
         self.assertEqual(array_to_tree(
             array=[self.parsed_query], filter=Q()), Q(id="first-post"))
 
-        # Construct Q tree for OR operator
-        filter = Q()
-        filter.add(Q(id="first-post"), Q.OR)
-        filter.add(~Q(id="first-post"), Q.OR)
-
+        # Checking for OR and NOT operators
         self.assertEqual(
             array_to_tree(array=[
                 {'operator': 'OR'},
                 self.parsed_query,
                 {'operator': 'NOT'},
                 self.parsed_query], filter=Q()
-            ), filter
+            ), self.construct_actual_filter(conn_type=Q.OR)
         )
 
-        # Construct Q tree for AND operator
-        filter = Q()
-        filter.add(Q(id="first-post"), Q.AND)
-        filter.add(~Q(id="first-post"), Q.AND)
-
+        # Checking for AND and NOT operators
         self.assertEqual(
             array_to_tree(array=[
                 {'operator': 'AND'},
                 self.parsed_query,
                 {'operator': 'NOT'},
                 self.parsed_query], filter=Q()
-            ), filter
+            ), self.construct_actual_filter(conn_type=Q.AND)
         )
+
+    def construct_actual_filter(self, conn_type=Q.AND):
+        """Construct actual Q filter
+
+        Args:
+            conn_type (str, optional): Connection type. Defaults to Q.AND.
+
+        Returns:
+            Q: Query filter
+        """
+        filter = Q()
+        filter.add(Q(id="first-post"), conn_type=conn_type)
+        filter.add(~Q(id="first-post"), conn_type=conn_type)
+        return filter
