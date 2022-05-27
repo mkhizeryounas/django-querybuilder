@@ -12,7 +12,6 @@ def list(filter=Q()):
     Returns:
         list: list of all the records
     """
-    logging.debug(f"Filter: {filter}")
     return Post.objects.filter(filter).all()
 
 
@@ -23,9 +22,9 @@ def create(post_data):
         post_data (dict): post data
 
     Returns:
-        int: success boolean (1 if success, 0 otherwise)
+        bool: success boolean
     """
-    return Post.objects.update_or_create(**post_data)
+    return True if Post.objects.create(**post_data) == 1 else False
 
 
 def exists(id):
@@ -40,18 +39,6 @@ def exists(id):
     return Post.objects.filter(id=id).exists()
 
 
-def get(id):
-    """Get a single post
-
-    Args:
-        id (str): post id
-
-    Returns:
-        dict: Single post record
-    """
-    return Post.objects.filter(id=id).first()
-
-
 def update(id, post_data):
     """Update post
 
@@ -60,6 +47,6 @@ def update(id, post_data):
         post_data (dict): fields to update
 
     Returns:
-        int: success boolean (1 if success, 0 otherwise)
+        bool: success boolean
     """
-    return Post.objects.filter(id=id).update(**post_data)
+    return True if Post.objects.filter(id=id).update(**post_data) == 1 else False
