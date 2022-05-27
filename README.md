@@ -20,7 +20,7 @@ $ python manage.py runserver
 ### Test
 
 ```bash
-$ python manage.py test
+$ python manage.py test --with-coverage
 ```
 
 ### Cleanup

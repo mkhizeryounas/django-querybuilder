@@ -38,6 +38,19 @@ class TestPostView(APITestCase):
         self.assertEqual(data_in_db.views, payload['views'])
         self.assertEqual(data_in_db.timestamp, payload['timestamp'])
 
+    def test_should_return_422_on_empty_body_post(self):
+        """Test create post"""
+        response = self.client.post(self.url, {}, format='json')
+        self.assertEqual(response.status_code,
+                         status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+    def test_should_return_422_on_invalid_body_post(self):
+        """Test create post"""
+        response = self.client.post(
+            self.url, {'id': 'random-id'}, format='json')
+        self.assertEqual(response.status_code,
+                         status.HTTP_422_UNPROCESSABLE_ENTITY)
+
     def test_should_update_post(self):
         """Test update post"""
         update_payload = self.payload.copy()
@@ -86,3 +99,9 @@ class TestPostView(APITestCase):
             self.assertEqual(response.data[0]['id'], self.payload['id'])
         else:
             self.assertNotEqual(response.data[0]['id'], self.payload['id'])
+
+    def test_should_return_400_on_invalid_filter_posts(self):
+        """Test filter posts"""
+        response = self.client.get(
+            self.url, {'query': f'EQUAL(id, "{self.payload["id"]}"))'})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

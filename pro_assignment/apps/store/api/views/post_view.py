@@ -15,21 +15,21 @@ class PostView(ListAPIView):
     pagination_class = PageNumberPagination
 
     # The following code is not required as per the requirements, but to keep RMM Level 3 we should paginate the data and return the hyperlinks for the next and previous pages (https://martinfowler.com/articles/richardsonMaturityModel.html)
-    def get_queryset(self):
-        """Get list of posts
+    # def get_queryset(self):
+    #     """Get list of posts
 
-        Returns:
-            list: List of posts
-        """
-        try:
-            # Get the query parameters and convert them to filter
-            query = self.request.GET.get('query', None)
-            logger.debug(f"Query Params: {query}")
-            filter = convert_query_to_filter(query)
-            return post_service.list(filter)
-        except Exception as e:
-            logger.exception(e)
-            return response.error(data={"detail": str(e)})
+    #     Returns:
+    #         list: List of posts
+    #     """
+    #     try:
+    #         # Get the query parameters and convert them to filter
+    #         query = self.request.GET.get('query', None)
+    #         logger.debug(f"Query Params: {query}")
+    #         filter = convert_query_to_filter(query)
+    #         return post_service.list(filter)
+    #     except Exception as e:
+    #         logger.exception(e)
+    #         return response.error(data={"detail": str(e)})
 
     def get(self, request):
         """Get list of posts
@@ -64,37 +64,33 @@ class PostView(ListAPIView):
         Raises:
             ValidationError: if id is not provided or serializer fails
         """
-        try:
-            serializer = PostSerializer(data=request.data)
-            id = request.data.get('id', None)
-            status = 200
-            post = {}
+        serializer = PostSerializer(data=request.data)
+        id = request.data.get('id', None)
+        status = 200
+        post = {}
 
-            # id is always required to run the post method
-            if id is None:
-                return response.error(data={
-                    "id": ["This field is required."]
-                }, status=422)
-            hasPost = post_service.exists(id)
-            if hasPost:
-                # Conflict update the existing post
-                post_service.update(id, request.data)
-                # post = post_service.get(id)
-                logger.info(
-                    f"Updated post with id: {id}")
-            elif serializer.is_valid():
-                # Create a new entry in the database
-                # post = post_service.create(serializer.data)
-                post_service.create(serializer.data)
-                # status = 201
-                logger.info(f"Created post with id: {id}")
-            else:
-                return response.error(data=serializer.errors, status=422)
+        # id is always required to run the post method
+        if id is None:
+            return response.error(data={
+                "id": ["This field is required."]
+            }, status=422)
+        hasPost = post_service.exists(id)
+        if hasPost:
+            # Conflict update the existing post
+            post_service.update(id, request.data)
+            # post = post_service.get(id)
+            logger.info(
+                f"Updated post with id: {id}")
+        elif serializer.is_valid():
+            # Create a new entry in the database
+            # post = post_service.create(serializer.data)
+            post_service.create(serializer.data)
+            # status = 201
+            logger.info(f"Created post with id: {id}")
+        else:
+            return response.error(data=serializer.errors, status=422)
 
-            # Disabling the data return as per requirements
-            # serializer = PostSerializer(post)
-            # return response.ok(serializer.data, status=status)
-            return response.ok(post, status=status)
-        except Exception as e:
-            logger.exception(e)
-            return response.error(data={"detail": str(e)})
+        # Disabling the data return as per requirements
+        # serializer = PostSerializer(post)
+        # return response.ok(serializer.data, status=status)
+        return response.ok(post, status=status)

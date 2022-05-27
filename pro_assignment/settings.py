@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'rest_framework',
     "pro_assignment.apps.store",
+    "django_nose"
 ]
 
 MIDDLEWARE = [
@@ -158,3 +159,10 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
 }
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+# Tell nose to measure coverage on the 'foo' and 'bar' apps
+NOSE_ARGS = [
+    '--with-coverage',
+    '--cover-package=pro_assignment.apps.store',
+]

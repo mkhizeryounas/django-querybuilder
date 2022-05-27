@@ -1,0 +1,17 @@
+[run]
+omit = 
+    */app_models/*
+    */admin.py
+    */apps.py
+    */models.py
+    */__init__.py
+
+
+[report]
+omit = 
+    */app_models/*
+    */admin.py
+    */apps.py
+    */models.py
+    */__init__.py
+show_missing = True
